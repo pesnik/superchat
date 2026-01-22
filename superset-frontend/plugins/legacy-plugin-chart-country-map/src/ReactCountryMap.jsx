@@ -83,5 +83,13 @@ export default styled(CountryMap)`
     .superset-legacy-chart-country-map .legend rect {
       stroke: ${theme.colors.grayscale.light1};
     }
+
+    .superset-legacy-chart-country-map .label-layer text.region-label {
+      text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+    }
+
+    .superset-legacy-chart-country-map .label-layer .label-bg {
+      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.2));
+    }
   `}
 `;

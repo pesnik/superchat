@@ -43,6 +43,12 @@ const propTypes = {
   mapBaseUrl: PropTypes.string,
   numberFormat: PropTypes.string,
   showLegend: PropTypes.bool,
+  showLabels: PropTypes.bool,
+  labelContent: PropTypes.string,
+  labelSize: PropTypes.number,
+  labelColor: PropTypes.string,
+  labelBackground: PropTypes.string,
+  labelLineHeight: PropTypes.number,
   jsColumns: PropTypes.array,
   jsDataMutator: PropTypes.string,
 };
@@ -60,6 +66,12 @@ function CountryMap(element, props) {
     colorScheme,
     sliceId,
     showLegend,
+    showLabels,
+    labelContent,
+    labelSize,
+    labelColor,
+    labelBackground,
+    labelLineHeight,
     jsDataMutator,
   } = props;
 
@@ -135,6 +147,7 @@ function CountryMap(element, props) {
     .attr('height', height);
   const g = svg.append('g');
   const mapLayer = g.append('g').classed('map-layer', true);
+  const labelLayer = g.append('g').classed('label-layer', true);
   const textLayer = g
     .append('g')
     .classed('text-layer', true)
@@ -306,6 +319,30 @@ function CountryMap(element, props) {
     resultText.text('');
   };
 
+  const getRegionName = (feature) => {
+    if (feature && feature.properties) {
+      return feature.properties.NAME_2 || feature.properties.NAME_1 || feature.properties.NAME_0 || '';
+    }
+    return '';
+  };
+
+  const getLabelText = (feature, metricValue) => {
+    const regionName = getRegionName(feature);
+    
+    switch (labelContent) {
+      case 'name':
+        return regionName;
+      case 'metric':
+        return format(metricValue);
+      case 'name_metric':
+      default:
+        if (regionName && metricValue !== undefined) {
+          return `${regionName}\n${format(metricValue)}`;
+        }
+        return regionName || format(metricValue);
+    }
+  };
+
   function drawMap(mapData) {
     const { features } = mapData;
     const center = d3.geo.centroid(mapData);
@@ -341,6 +378,60 @@ function CountryMap(element, props) {
       .on('mouseenter', mouseenter)
       .on('mouseout', mouseout)
       .on('click', clicked);
+
+    if (showLabels && features.length > 0) {
+      const labelSelection = labelLayer
+        .selectAll('g.label-group')
+        .data(features)
+        .enter()
+        .append('g')
+        .attr('class', 'label-group')
+        .attr('transform', d => {
+          const centroid = path.centroid(d);
+          return `translate(${centroid[0]}, ${centroid[1]})`;
+        });
+
+      labelSelection.each(function(d) {
+        const regionData = data.find(item => item.country_id === d.properties.ISO);
+        const metricValue = regionData ? regionData.metric : undefined;
+        const labelText = getLabelText(d, metricValue);
+        const group = d3.select(this);
+
+        if (labelBackground && labelBackground !== 'transparent') {
+          group.append('rect')
+            .attr('class', 'label-bg')
+            .attr('x', -30)
+            .attr('y', -20)
+            .attr('width', 60)
+            .attr('height', 40)
+            .attr('rx', 4)
+            .attr('ry', 4)
+            .attr('fill', labelBackground)
+            .attr('stroke', labelColor)
+            .attr('stroke-width', 0.5)
+            .style('opacity', 0.9);
+        }
+
+        const textLines = labelText.split('\n');
+        const lineHeight = labelSize * labelLineHeight;
+        const totalHeight = textLines.length * lineHeight;
+        const startY = -(totalHeight / 2) + (labelSize / 2);
+
+        textLines.forEach((line, i) => {
+          group.append('text')
+            .attr('class', 'region-label')
+            .attr('text-anchor', 'middle')
+            .attr('dominant-baseline', 'middle')
+            .attr('y', startY + (i * lineHeight))
+            .style('font-size', `${labelSize}px`)
+            .style('fill', labelColor)
+            .style('font-family', 'Arial, sans-serif')
+            .style('font-weight', 'bold')
+            .style('pointer-events', 'none')
+            .text(line);
+        });
+      });
+    }
   }
 
   const map = maps[country];

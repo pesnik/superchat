@@ -85,6 +85,90 @@ const config: ControlPanelConfig = {
       ],
     },
     {
+      label: t('Labels'),
+      expanded: true,
+      tabOverride: 'customize',
+      controlSetRows: [
+        [
+          {
+            name: 'show_labels',
+            config: {
+              type: 'CheckboxControl',
+              label: t('Show labels'),
+              renderTrigger: true,
+              default: false,
+              description: t('Display region labels on the map'),
+            },
+          },
+        ],
+        [
+          {
+            name: 'label_content',
+            config: {
+              type: 'SelectControl',
+              label: t('Label content'),
+              renderTrigger: true,
+              default: 'name_metric',
+              choices: [
+                ['name', t('Region name only')],
+                ['metric', t('Metric value only')],
+                ['name_metric', t('Name and metric')],
+              ],
+              description: t('What to display in the label'),
+            },
+          },
+        ],
+        [
+          {
+            name: 'label_size',
+            config: {
+              type: 'TextControl',
+              label: t('Label font size'),
+              renderTrigger: true,
+              default: 12,
+              description: t('Font size for labels in pixels'),
+            },
+          },
+        ],
+        [
+          {
+            name: 'label_color',
+            config: {
+              type: 'TextControl',
+              label: t('Label color'),
+              renderTrigger: true,
+              default: '#000000',
+              description: t('Text color for labels (hex color code)'),
+            },
+          },
+        ],
+        [
+          {
+            name: 'label_background',
+            config: {
+              type: 'TextControl',
+              label: t('Label background'),
+              renderTrigger: true,
+              default: 'transparent',
+              description: t('Background color for labels (hex or "transparent")'),
+            },
+          },
+        ],
+        [
+          {
+            name: 'label_line_height',
+            config: {
+              type: 'TextControl',
+              label: t('Label line height'),
+              renderTrigger: true,
+              default: 1.2,
+              description: t('Line height for multiline labels'),
+            },
+          },
+        ],
+      ],
+    },
+    {
       label: t('Advanced'),
       controlSetRows: [
         [
