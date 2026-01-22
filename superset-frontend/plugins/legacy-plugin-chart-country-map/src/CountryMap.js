@@ -209,14 +209,20 @@ function CountryMap(element, props) {
     .append('svg:svg')
     .attr('width', width)
     .attr('height', height)
-    .attr('preserveAspectRatio', 'xMidYMid meet')
-    .style('background-color', mapBackgroundColor);
+    .attr('preserveAspectRatio', 'xMidYMid meet');
+  if (mapBackgroundColor) {
+    svg.style('background-color', mapBackgroundColor);
+  }
   const backgroundRect = svg
     .append('rect')
     .attr('class', 'background')
     .attr('width', width)
-    .attr('height', height)
-    .attr('fill', mapBackgroundColor);
+    .attr('height', height);
+  if (mapBackgroundColor) {
+    backgroundRect.attr('fill', mapBackgroundColor);
+  } else {
+    backgroundRect.attr('fill', '#ffffff');
+  }
   const g = svg.append('g');
   const mapLayer = g.append('g').classed('map-layer', true);
   const labelLayer = g.append('g').classed('label-layer', true);

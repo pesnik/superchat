@@ -48,7 +48,7 @@ export default function transformProps(chartProps) {
     colorScheme,
     sliceId,
     showLegend,
-    mapBackgroundColor: mapBackgroundColor || '#ffffff',
+    mapBackgroundColor,
     showLabels,
     labelContent,
     labelSize: Number(labelSize) || 12,
