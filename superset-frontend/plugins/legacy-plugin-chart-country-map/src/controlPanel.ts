@@ -144,18 +144,6 @@ const config: ControlPanelConfig = {
         ],
         [
           {
-            name: 'label_background',
-            config: {
-              type: 'TextControl',
-              label: t('Label background'),
-              renderTrigger: true,
-              default: 'transparent',
-              description: t('Background color for labels (hex or "transparent")'),
-            },
-          },
-        ],
-        [
-          {
             name: 'label_line_height',
             config: {
               type: 'TextControl',
@@ -190,7 +178,7 @@ const config: ControlPanelConfig = {
             name: 'js_data_mutator',
             config: {
               type: 'TextAreaControl',
-              language: 'javascript',
+              // language: 'javascript',
               expanded: true,
               label: t('JavaScript Data Interceptor'),
               description: t(

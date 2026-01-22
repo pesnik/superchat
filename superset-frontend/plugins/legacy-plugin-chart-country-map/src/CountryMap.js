@@ -47,7 +47,6 @@ const propTypes = {
   labelContent: PropTypes.string,
   labelSize: PropTypes.number,
   labelColor: PropTypes.string,
-  labelBackground: PropTypes.string,
   labelLineHeight: PropTypes.number,
   jsColumns: PropTypes.array,
   jsDataMutator: PropTypes.string,
@@ -70,7 +69,6 @@ function CountryMap(element, props) {
     labelContent,
     labelSize,
     labelColor,
-    labelBackground,
     labelLineHeight,
     jsDataMutator,
   } = props;
@@ -396,21 +394,6 @@ function CountryMap(element, props) {
         const metricValue = regionData ? regionData.metric : undefined;
         const labelText = getLabelText(d, metricValue);
         const group = d3.select(this);
-
-        if (labelBackground && labelBackground !== 'transparent') {
-          group.append('rect')
-            .attr('class', 'label-bg')
-            .attr('x', -30)
-            .attr('y', -20)
-            .attr('width', 60)
-            .attr('height', 40)
-            .attr('rx', 4)
-            .attr('ry', 4)
-            .attr('fill', labelBackground)
-            .attr('stroke', labelColor)
-            .attr('stroke-width', 0.5)
-            .style('opacity', 0.9);
-        }
 
         const textLines = labelText.split('\n');
         const lineHeight = labelSize * labelLineHeight;
