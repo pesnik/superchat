@@ -326,18 +326,19 @@ function CountryMap(element, props) {
 
   const getLabelText = (feature, metricValue) => {
     const regionName = getRegionName(feature);
+    const hasMetric = metricValue !== undefined && metricValue !== null;
     
     switch (labelContent) {
       case 'name':
         return regionName;
       case 'metric':
-        return format(metricValue);
+        return hasMetric ? format(metricValue) : '';
       case 'name_metric':
       default:
-        if (regionName && metricValue !== undefined) {
+        if (regionName && hasMetric) {
           return `${regionName}\n${format(metricValue)}`;
         }
-        return regionName || format(metricValue);
+        return regionName;
     }
   };
 
