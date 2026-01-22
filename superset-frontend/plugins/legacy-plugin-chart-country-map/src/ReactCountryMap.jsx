@@ -71,5 +71,17 @@ export default styled(CountryMap)`
       cursor: pointer;
       stroke: ${theme.colors.grayscale.light2};
     }
+
+    .superset-legacy-chart-country-map .legend {
+      font-family: ${theme.typography.families.sansSerif};
+    }
+
+    .superset-legacy-chart-country-map .legend text {
+      fill: ${theme.colors.grayscale.dark1};
+    }
+
+    .superset-legacy-chart-country-map .legend rect {
+      stroke: ${theme.colors.grayscale.light1};
+    }
   `}
 `;

@@ -42,6 +42,7 @@ import benin from './countries/benin.geojson';
 import bermuda from './countries/bermuda.geojson';
 import bhutan from './countries/bhutan.geojson';
 import bolivia from './countries/bolivia.geojson';
+import bl_sales_region from './countries/bl_sales_region.geojson';
 import bosnia_and_herzegovina from './countries/bosnia_and_herzegovina.geojson';
 import botswana from './countries/botswana.geojson';
 import brazil from './countries/brazil.geojson';
@@ -190,6 +191,7 @@ import taiwan from './countries/taiwan.geojson';
 import tajikistan from './countries/tajikistan.geojson';
 import tanzania from './countries/tanzania.geojson';
 import thailand from './countries/thailand.geojson';
+import thana from './countries/thana.geojson';
 import the_bahamas from './countries/the_bahamas.geojson';
 import timorleste from './countries/timorleste.geojson';
 import togo from './countries/togo.geojson';
@@ -243,6 +245,7 @@ export const countries = {
   bermuda,
   bhutan,
   bolivia,
+  bl_sales_region,
   bosnia_and_herzegovina,
   botswana,
   brazil,
@@ -391,6 +394,7 @@ export const countries = {
   tajikistan,
   tanzania,
   thailand,
+  thana,
   the_bahamas,
   timorleste,
   togo,
@@ -434,6 +438,12 @@ export const countryOptions = Object.keys(countries).map(x => {
   }
   if (x === 'turkey_regions') {
     return [x, 'Turkey (regions)'];
+  }
+  if (x === 'bl_sales_region') {
+    return [x, 'Bangladesh (Banglalink Sales Region)'];
+  }
+  if (x === 'thana') {
+    return [x, 'Bangladesh (Thana)'];
   }
   return [
     x,

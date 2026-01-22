@@ -26,6 +26,7 @@ import {
   CategoricalColorNamespace,
 } from '@superset-ui/core';
 import countries, { countryOptions } from './countries';
+import sandboxedEval from './utils/sandbox';
 
 const propTypes = {
   data: PropTypes.arrayOf(
@@ -41,13 +42,16 @@ const propTypes = {
   linearColorScheme: PropTypes.string,
   mapBaseUrl: PropTypes.string,
   numberFormat: PropTypes.string,
+  showLegend: PropTypes.bool,
+  jsColumns: PropTypes.array,
+  jsDataMutator: PropTypes.string,
 };
 
 const maps = {};
 
 function CountryMap(element, props) {
   const {
-    data,
+    data: rawData,
     width,
     height,
     country,
@@ -55,20 +59,61 @@ function CountryMap(element, props) {
     numberFormat,
     colorScheme,
     sliceId,
+    showLegend,
+    jsDataMutator,
   } = props;
 
   const container = element;
   const format = getNumberFormatter(numberFormat);
+
+  let data = Array.isArray(rawData) ? [...rawData] : [];
+  let customLegend = null;
+  if (jsDataMutator) {
+    try {
+      const jsFnMutator = sandboxedEval(jsDataMutator);
+      const result = jsFnMutator(data);
+      
+      if (result && typeof result === 'object' && !Array.isArray(result)) {
+        if (Array.isArray(result.data)) {
+          data = result.data;
+        }
+        if (Array.isArray(result.legend)) {
+          customLegend = result.legend;
+        }
+      } else if (Array.isArray(result)) {
+        data = result;
+      }
+    } catch (error) {
+      console.error('Error in js_data_mutator:', error);
+      data = Array.isArray(rawData) ? [...rawData] : [];
+    }
+  }
+
+  const hasColorColumn = data.length > 0 && data.some(d => d.color);
+
+  const isValidHexColor = (color) => {
+    if (!color) return false;
+    return /^#([0-9A-F]{3}){1,2}([0-9A-F]{2})?$/i.test(color);
+  };
+
   const linearColorScale = getSequentialSchemeRegistry()
     .get(linearColorScheme)
     .createLinearScale(d3Extent(data, v => v.metric));
   const colorScale = CategoricalColorNamespace.getScale(colorScheme);
 
+  const usingAdvancedFeatures = hasColorColumn || jsDataMutator;
+
   const colorMap = {};
   data.forEach(d => {
-    colorMap[d.country_id] = colorScheme
-      ? colorScale(d.country_id, sliceId)
-      : linearColorScale(d.metric);
+    if (hasColorColumn && d.color && isValidHexColor(d.color)) {
+      colorMap[d.country_id] = d.color;
+    } else if (usingAdvancedFeatures) {
+      colorMap[d.country_id] = linearColorScale(d.metric);
+    } else if (colorScheme) {
+      colorMap[d.country_id] = colorScale(d.country_id, sliceId);
+    } else {
+      colorMap[d.country_id] = linearColorScale(d.metric);
+    }
   });
   const colorFn = d => colorMap[d.properties.ISO] || 'none';
 
@@ -99,6 +144,79 @@ function CountryMap(element, props) {
     .append('text')
     .classed('result-text', true)
     .attr('dy', '1em');
+
+  let legend = null;
+  if (showLegend) {
+    legend = g.append('g')
+      .classed('legend', true)
+      .attr('transform', `translate(${width - 150}, 20)`);
+
+    const legendTitle = legend.append('text')
+      .attr('x', 0)
+      .attr('y', 0)
+      .style('font-weight', 'bold')
+      .style('font-size', '12px')
+      .text('Legend');
+
+    let legendY = 20;
+    const legendItemHeight = 15;
+
+    if (customLegend && customLegend.length > 0) {
+      customLegend.forEach((legendItem, i) => {
+        const legendGroup = legend.append('g')
+          .attr('transform', `translate(0, ${legendY + i * legendItemHeight})`);
+
+        legendGroup.append('rect')
+          .attr('width', 12)
+          .attr('height', 12)
+          .attr('fill', legendItem.color || '#ccc')
+          .attr('stroke', '#999')
+          .attr('stroke-width', 1);
+
+        legendGroup.append('text')
+          .attr('x', 18)
+          .attr('y', 9)
+          .style('font-size', '11px')
+          .text(legendItem.label || '');
+      });
+    } else if (data.length > 0) {
+      const maxItems = Math.min(10, data.length);
+
+      data.slice(0, maxItems).forEach((d, i) => {
+        const legendItem = legend.append('g')
+          .attr('transform', `translate(0, ${legendY + i * legendItemHeight})`);
+
+        legendItem.append('rect')
+          .attr('width', 12)
+          .attr('height', 12)
+          .attr('fill', colorMap[d.country_id] || '#ccc')
+          .attr('stroke', '#999')
+          .attr('stroke-width', 1);
+
+        legendItem.append('text')
+          .attr('x', 18)
+          .attr('y', 9)
+          .style('font-size', '11px')
+          .text(d.country_id);
+
+        legendItem.append('text')
+          .attr('x', 80)
+          .attr('y', 9)
+          .style('font-size', '11px')
+          .style('text-anchor', 'end')
+          .text(format(d.metric));
+      });
+
+      if (data.length > maxItems) {
+        legend.append('text')
+          .attr('x', 0)
+          .attr('y', legendY + maxItems * legendItemHeight)
+          .style('font-size', '11px')
+          .style('font-style', 'italic')
+          .text(`... and ${data.length - maxItems} more`);
+      }
+    }
+  }
 
   let centered;
 
@@ -170,7 +288,6 @@ function CountryMap(element, props) {
   };
 
   const mouseenter = function mouseenter(d) {
-    // Darken color
     let c = colorFn(d);
     if (c !== 'none') {
       c = d3.rgb(c).darker().toString();
@@ -200,13 +317,11 @@ function CountryMap(element, props) {
       .translate([width / 2, height / 2]);
     path.projection(projection);
 
-    // Compute scale that fits container.
     const bounds = path.bounds(mapData);
     const hscale = (scale * width) / (bounds[1][0] - bounds[0][0]);
     const vscale = (scale * height) / (bounds[1][1] - bounds[0][1]);
     const newScale = hscale < vscale ? hscale : vscale;
 
-    // Compute bounds and offset using the updated scale.
     projection.scale(newScale);
     const newBounds = path.bounds(mapData);
     projection.translate([
@@ -214,7 +329,6 @@ function CountryMap(element, props) {
       height - (newBounds[0][1] + newBounds[1][1]) / 2,
     ]);
 
-    // Draw each province as a path
     mapLayer
       .selectAll('path')
       .data(features)

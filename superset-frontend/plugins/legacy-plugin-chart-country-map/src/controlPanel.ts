@@ -16,12 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { t, validateNonEmpty } from '@superset-ui/core';
+import { t, validateNonEmpty, FeatureFlag, isFeatureEnabled } from '@superset-ui/core';
 import {
   ControlPanelConfig,
   D3_FORMAT_OPTIONS,
   D3_FORMAT_DOCS,
   getStandardizedControls,
+  sharedControls,
 } from '@superset-ui/chart-controls';
 import { countryOptions } from './countries';
 
@@ -69,6 +70,62 @@ const config: ControlPanelConfig = {
           },
         ],
         ['linear_color_scheme'],
+        [
+          {
+            name: 'show_legend',
+            config: {
+              type: 'CheckboxControl',
+              label: t('Show legend'),
+              renderTrigger: true,
+              default: false,
+              description: t('Whether to display a legend for the chart'),
+            },
+          },
+        ],
+      ],
+    },
+    {
+      label: t('Advanced'),
+      controlSetRows: [
+        [
+          {
+            name: 'js_columns',
+            config: {
+              ...sharedControls.groupby,
+              label: t('Extra Data for JS'),
+              default: [],
+              description: t(
+                'List of extra columns made available in the data. ' +
+                'Add a column named "color" with hex codes (e.g., #FF5733) to control region colors directly.',
+              ),
+            },
+          },
+        ],
+        [
+          {
+            name: 'js_data_mutator',
+            config: {
+              type: 'TextAreaControl',
+              language: 'javascript',
+              expanded: true,
+              label: t('JavaScript Data Interceptor'),
+              description: t(
+                'Define a JavaScript function to modify data. ' +
+                'Example: data => data.map(d => ({ ...d, color: d.metric > 1000000 ? "#d62728" : "#2ca02c" }))\n\n' +
+                'For custom legend, return an object with legend data: { data: [...], legend: [{ color: "#ef4444", label: "Low (0-500)" }, ...] }',
+              ),
+              height: 100,
+              default: '',
+              renderTrigger: true,
+              warning: !isFeatureEnabled(FeatureFlag.EnableJavascriptControls)
+                ? t(
+                  'This functionality is disabled in your environment for security reasons.',
+                )
+                : null,
+              readOnly: !isFeatureEnabled(FeatureFlag.EnableJavascriptControls),
+            },
+          },
+        ],
       ],
     },
   ],

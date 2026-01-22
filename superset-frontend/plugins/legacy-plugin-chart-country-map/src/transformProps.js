@@ -24,6 +24,9 @@ export default function transformProps(chartProps) {
     selectCountry,
     colorScheme,
     sliceId,
+    showLegend,
+    jsColumns = [],
+    jsDataMutator,
   } = formData;
 
   return {
@@ -35,5 +38,8 @@ export default function transformProps(chartProps) {
     numberFormat,
     colorScheme,
     sliceId,
+    showLegend,
+    jsColumns,
+    jsDataMutator,
   };
 }
