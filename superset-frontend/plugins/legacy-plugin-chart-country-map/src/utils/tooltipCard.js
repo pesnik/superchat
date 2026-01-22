@@ -45,7 +45,6 @@ function formatText(text) {
   formatted = formatted.replace(/\n/g, '<br/>');
   formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
-  formatted = formatted.replace(/#([^:]+):\s*/g, '<strong style="color: #666; font-weight: 600;">$1:</strong> ');
   return formatted;
 }
 

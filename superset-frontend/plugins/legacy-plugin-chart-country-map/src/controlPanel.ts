@@ -213,16 +213,15 @@ const config: ControlPanelConfig = {
             config: {
               type: 'TextAreaControl',
               label: t('Tooltip Template'),
-              default: '{country}: {formatted}',
+              language: 'markdown',
+              default: '**{country}**: {formatted}',
               description: t(
-                'Custom tooltip content using variables and markdown-like syntax.\n\n' +
+                'Tooltip content using markdown syntax.\n\n' +
                 'Variables: {country}, {iso}, {value}, {formatted}, {rank}\n\n' +
-                'Markdown: **bold**, *italic*\n' +
-                'Labels: #LabelName: value (renders as bold gray label)\n\n' +
+                'Markdown: **bold**, *italic*\n\n' +
                 'Examples:\n' +
-                '• {country}: {formatted}\n' +
-                '• {country}\\n**{formatted}**\\nRank: #{rank}\n' +
-                '• #Region: {country}\\n#Value: {formatted}\\n#ISO: {iso}'
+                '• **Region**: {country}\\n**Value**: {formatted}\n' +
+                '• **{country}**\\n_{formatted}_\\nRank: #{rank}'
               ),
               height: 120,
               renderTrigger: true,
