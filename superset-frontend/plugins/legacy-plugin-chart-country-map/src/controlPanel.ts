@@ -169,6 +169,71 @@ const config: ControlPanelConfig = {
       ],
     },
     {
+      label: t('Tooltip'),
+      expanded: true,
+      tabOverride: 'customize',
+      controlSetRows: [
+        [
+          {
+            name: 'tooltip_type',
+            config: {
+              type: 'SelectControl',
+              label: t('Tooltip Type'),
+              default: 'card',
+              choices: [
+                ['none', t('None')],
+                ['card', t('Card Tooltip')],
+              ],
+              description: t('Choose how to display information on hover'),
+              renderTrigger: true,
+            },
+          },
+        ],
+        [
+          {
+            name: 'tooltip_card_style',
+            config: {
+              type: 'SelectControl',
+              label: t('Card Style'),
+              default: 'default',
+              choices: [
+                ['default', t('White')],
+                ['minimal', t('Dark')],
+              ],
+              description: t('Style preset for the tooltip card. White is clean and visible on light backgrounds. Dark is compact and works well on any background.'),
+              renderTrigger: true,
+              visibility: ({ controls }: any) =>
+                controls?.tooltip_type?.value === 'card',
+            },
+          },
+        ],
+        [
+          {
+            name: 'tooltip_template',
+            config: {
+              type: 'TextAreaControl',
+              label: t('Tooltip Template'),
+              default: '{country}: {formatted}',
+              description: t(
+                'Custom tooltip content using variables and markdown-like syntax.\n\n' +
+                'Variables: {country}, {iso}, {value}, {formatted}, {rank}\n\n' +
+                'Markdown: **bold**, *italic*\n' +
+                'New lines: Use actual line breaks\n\n' +
+                'Examples:\n' +
+                '• {country}: {formatted}\n' +
+                '• {country}\\n**{formatted}**\\nRank: #{rank}\n' +
+                '• **Region:** {country}\\n**Value:** {formatted}\\nISO: {iso}'
+              ),
+              height: 120,
+              renderTrigger: true,
+              visibility: ({ controls }: any) =>
+                controls?.tooltip_type?.value === 'card',
+            },
+          },
+        ],
+      ],
+    },
+    {
       label: t('Advanced'),
       controlSetRows: [
         [

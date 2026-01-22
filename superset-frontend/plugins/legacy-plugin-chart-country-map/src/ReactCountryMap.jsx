@@ -31,6 +31,8 @@ export default styled(CountryMap)`
   ${({ theme }) => `
     .superset-legacy-chart-country-map {
       position: relative;
+      width: 100%;
+      height: 100%;
     }
 
     .superset-legacy-chart-country-map .background {

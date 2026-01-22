@@ -33,6 +33,9 @@ export default function transformProps(chartProps) {
     labelLineHeight,
     jsColumns = [],
     jsDataMutator,
+    tooltipType = 'card',
+    tooltipCardStyle = 'default',
+    tooltipTemplate = '{country}: {formatted}',
   } = formData;
 
   return {
@@ -53,5 +56,8 @@ export default function transformProps(chartProps) {
     labelLineHeight: Number(labelLineHeight) || 1.2,
     jsColumns,
     jsDataMutator,
+    tooltipType,
+    tooltipCardStyle,
+    tooltipTemplate,
   };
 }

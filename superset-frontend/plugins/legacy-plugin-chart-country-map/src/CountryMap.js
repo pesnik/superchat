@@ -27,6 +27,7 @@ import {
 } from '@superset-ui/core';
 import countries, { countryOptions } from './countries';
 import sandboxedEval from './utils/sandbox';
+import { templateTooltipHtml } from './utils/tooltipCard';
 
 const propTypes = {
   data: PropTypes.arrayOf(
@@ -51,7 +52,73 @@ const propTypes = {
   labelLineHeight: PropTypes.number,
   jsColumns: PropTypes.array,
   jsDataMutator: PropTypes.string,
+  tooltipType: PropTypes.string,
+  tooltipCardStyle: PropTypes.string,
+  tooltipTemplate: PropTypes.string,
 };
+
+let tooltipElement = null;
+
+function showTooltip(content, event) {
+  if (!tooltipElement) {
+    tooltipElement = d3.select('body')
+      .append('div')
+      .attr('class', 'country-map-tooltip')
+      .style('position', 'absolute')
+      .style('z-index', '9999')
+      .style('display', 'none')
+      .style('pointer-events', 'none');
+  }
+  
+  const offsetX = 15;
+  const offsetY = 10;
+  
+  let pageX = event.pageX;
+  let pageY = event.pageY;
+  
+  if (pageX === undefined || pageY === undefined) {
+    const nativeEvent = event.originalEvent || event;
+    pageX = nativeEvent.clientX + window.pageXOffset;
+    pageY = nativeEvent.clientY + window.pageYOffset;
+  }
+  
+  let left = pageX + offsetX;
+  let top = pageY - offsetY;
+  
+  tooltipElement
+    .html(content)
+    .style('left', left + 'px')
+    .style('top', top + 'px')
+    .style('display', 'block');
+  
+  const tooltipNode = tooltipElement.node();
+  if (tooltipNode) {
+    const rect = tooltipNode.getBoundingClientRect();
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    
+    if (rect.right > windowWidth) {
+      left = pageX - rect.width - offsetX;
+      tooltipElement.style('left', left + 'px');
+    }
+    
+    if (rect.top < 0) {
+      top = pageY + offsetY;
+      tooltipElement.style('top', top + 'px');
+    }
+    
+    if (rect.bottom > windowHeight) {
+      top = pageY - rect.height - offsetY;
+      tooltipElement.style('top', top + 'px');
+    }
+  }
+}
+
+function hideTooltip() {
+  if (tooltipElement) {
+    tooltipElement.style('display', 'none');
+  }
+}
 
 const maps = {};
 
@@ -73,6 +140,9 @@ function CountryMap(element, props) {
     labelColor,
     labelLineHeight,
     jsDataMutator,
+    tooltipType,
+    tooltipCardStyle,
+    tooltipTemplate,
   } = props;
 
   const container = element;
@@ -261,30 +331,11 @@ function CountryMap(element, props) {
         'transform',
         `translate(${halfWidth},${halfHeight})scale(${k})translate(${-x},${-y})`,
       );
-    textLayer
-      .style('opacity', 0)
-      .attr(
-        'transform',
-        `translate(0,0)translate(${x},${hasCenter ? y - 5 : 45})`,
-      )
-      .transition()
-      .duration(750)
-      .style('opacity', 1);
-    bigText
-      .transition()
-      .duration(750)
-      .style('font-size', hasCenter ? 6 : 16);
-    resultText
-      .transition()
-      .duration(750)
-      .style('font-size', hasCenter ? 16 : 24);
   };
 
   backgroundRect.on('click', clicked);
 
-  const selectAndDisplayNameOfRegion = function selectAndDisplayNameOfRegion(
-    feature,
-  ) {
+  const selectAndDisplayNameOfRegion = function selectAndDisplayNameOfRegion(feature) {
     let name = '';
     if (feature && feature.properties) {
       if (feature.properties.ID_2) {
@@ -308,17 +359,43 @@ function CountryMap(element, props) {
       c = d3.rgb(c).darker().toString();
     }
     d3.select(this).style('fill', c);
-    selectAndDisplayNameOfRegion(d);
+    
     const result = data.filter(
       region => region.country_id === d.properties.ISO,
     );
-    updateMetrics(result);
+    
+    if (tooltipType === 'card' && result.length > 0) {
+      const regionData = result[0];
+      const regionName = d.properties.NAME_2 || d.properties.NAME_1 || d.properties.NAME_0 || '';
+      
+      const tooltipData = {
+        countryName: regionName,
+        isoCode: d.properties.ISO,
+        metricValue: String(regionData.metric),
+        metricFormatted: format(regionData.metric),
+        rank: regionData.rank,
+        ...regionData,
+      };
+      
+      const content = templateTooltipHtml(tooltipTemplate, tooltipData, tooltipCardStyle);
+      
+      if (content && d3.event) {
+        showTooltip(content, d3.event);
+      }
+    } else if (tooltipType === 'none') {
+      selectAndDisplayNameOfRegion(d);
+      updateMetrics(result);
+    }
   };
 
   const mouseout = function mouseout() {
     d3.select(this).style('fill', colorFn);
-    bigText.text('');
-    resultText.text('');
+    if (tooltipType === 'card') {
+      hideTooltip();
+    } else if (tooltipType === 'none') {
+      bigText.text('');
+      resultText.text('');
+    }
   };
 
   const getRegionName = (feature) => {
@@ -440,6 +517,13 @@ function CountryMap(element, props) {
       }
     });
   }
+
+  return function cleanup() {
+    if (tooltipElement) {
+      tooltipElement.remove();
+      tooltipElement = null;
+    }
+  };
 }
 
 CountryMap.displayName = 'CountryMap';
