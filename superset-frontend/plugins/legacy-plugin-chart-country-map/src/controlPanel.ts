@@ -218,11 +218,11 @@ const config: ControlPanelConfig = {
                 'Custom tooltip content using variables and markdown-like syntax.\n\n' +
                 'Variables: {country}, {iso}, {value}, {formatted}, {rank}\n\n' +
                 'Markdown: **bold**, *italic*\n' +
-                'New lines: Use actual line breaks\n\n' +
+                'Labels: #LabelName: value (renders as bold gray label)\n\n' +
                 'Examples:\n' +
                 '• {country}: {formatted}\n' +
                 '• {country}\\n**{formatted}**\\nRank: #{rank}\n' +
-                '• **Region:** {country}\\n**Value:** {formatted}\\nISO: {iso}'
+                '• #Region: {country}\\n#Value: {formatted}\\n#ISO: {iso}'
               ),
               height: 120,
               renderTrigger: true,
