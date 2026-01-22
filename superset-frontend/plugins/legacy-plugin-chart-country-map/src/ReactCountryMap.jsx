@@ -29,18 +29,11 @@ const CountryMap = ({ className, ...otherProps }) => (
 
 export default styled(CountryMap)`
   ${({ theme }) => `
-    .superset-legacy-chart-country-map svg {
-      background-color: ${theme.colors.grayscale.light5};
-    }
-
     .superset-legacy-chart-country-map {
       position: relative;
     }
 
     .superset-legacy-chart-country-map .background {
-      fill: ${theme.colors.grayscale.light5};
-      pointer-events: all;
-    }
 
     .superset-legacy-chart-country-map .map-layer {
       fill: ${theme.colors.grayscale.light5};

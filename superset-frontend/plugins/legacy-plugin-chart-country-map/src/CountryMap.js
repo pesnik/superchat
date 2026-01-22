@@ -43,6 +43,7 @@ const propTypes = {
   mapBaseUrl: PropTypes.string,
   numberFormat: PropTypes.string,
   showLegend: PropTypes.bool,
+  mapBackgroundColor: PropTypes.string,
   showLabels: PropTypes.bool,
   labelContent: PropTypes.string,
   labelSize: PropTypes.number,
@@ -65,6 +66,7 @@ function CountryMap(element, props) {
     colorScheme,
     sliceId,
     showLegend,
+    mapBackgroundColor,
     showLabels,
     labelContent,
     labelSize,
@@ -137,12 +139,14 @@ function CountryMap(element, props) {
     .append('svg:svg')
     .attr('width', width)
     .attr('height', height)
-    .attr('preserveAspectRatio', 'xMidYMid meet');
+    .attr('preserveAspectRatio', 'xMidYMid meet')
+    .style('background-color', mapBackgroundColor);
   const backgroundRect = svg
     .append('rect')
     .attr('class', 'background')
     .attr('width', width)
-    .attr('height', height);
+    .attr('height', height)
+    .attr('fill', mapBackgroundColor);
   const g = svg.append('g');
   const mapLayer = g.append('g').classed('map-layer', true);
   const labelLayer = g.append('g').classed('label-layer', true);

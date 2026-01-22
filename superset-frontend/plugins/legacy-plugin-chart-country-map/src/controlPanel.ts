@@ -82,6 +82,18 @@ const config: ControlPanelConfig = {
             },
           },
         ],
+        [
+          {
+            name: 'map_background_color',
+            config: {
+              type: 'TextControl',
+              label: t('Map background color'),
+              renderTrigger: true,
+              default: '#ffffff',
+              description: t('Background color of the map (hex color code)'),
+            },
+          },
+        ],
       ],
     },
     {
