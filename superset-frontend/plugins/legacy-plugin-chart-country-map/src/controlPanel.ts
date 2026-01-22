@@ -254,7 +254,7 @@ const config: ControlPanelConfig = {
             name: 'js_data_mutator',
             config: {
               type: 'TextAreaControl',
-              // language: 'javascript',
+              language: 'javascript',
               expanded: true,
               label: t('JavaScript Data Interceptor'),
               description: t(
