@@ -197,7 +197,7 @@ function CountryMap(element, props) {
       colorMap[d.country_id] = linearColorScale(d.metric);
     }
   });
-  const colorFn = d => colorMap[d.properties.ISO] || 'none';
+  const colorFn = d => colorMap[d.properties.ISO] || '#f0f0f0';
 
   const path = d3.geo.path();
   const div = d3.select(container);
