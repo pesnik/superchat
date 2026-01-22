@@ -461,6 +461,8 @@ function CountryMap(element, props) {
       .attr('class', 'region')
       .attr('vector-effect', 'non-scaling-stroke')
       .style('fill', colorFn)
+      .style('stroke', '#888888')
+      .style('stroke-width', '0.5px')
       .on('mouseenter', mouseenter)
       .on('mouseout', mouseout)
       .on('click', clicked);
