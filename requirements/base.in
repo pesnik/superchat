@@ -63,3 +63,6 @@ setuptools<81
 # explicitly in pyproject.toml and pin google-auth to the post-drop range so
 # the install path is internally consistent (#40962).
 google-auth>=2.53.0,<3.0.0
+
+# Teradata database driver
+teradatasqlalchemy==17.20.0.0

@@ -168,7 +168,6 @@ greenlet==3.5.1
     # via
     #   apache-superset (pyproject.toml)
     #   shillelagh
-    #   sqlalchemy
 gunicorn==26.0.0
     # via apache-superset (pyproject.toml)
 h11==0.16.0
@@ -306,6 +305,8 @@ pyasn1-modules==0.4.2
     # via google-auth
 pycparser==2.22
     # via cffi
+pycryptodome==3.23.0
+    # via teradatasql
 pydantic==2.11.7
     # via
     #   apache-superset (pyproject.toml)
@@ -407,6 +408,7 @@ sqlalchemy==1.4.54
     #   shillelagh
     #   sqlalchemy-continuum
     #   sqlalchemy-utils
+    #   teradatasqlalchemy
 sqlalchemy-continuum==1.6.0
     # via apache-superset (pyproject.toml)
 sqlalchemy-utils==0.42.1
@@ -422,6 +424,10 @@ sshtunnel==0.4.0
     # via apache-superset (pyproject.toml)
 tabulate==0.10.0
     # via apache-superset (pyproject.toml)
+teradatasql==20.0.0.63
+    # via teradatasqlalchemy
+teradatasqlalchemy==17.20.0.0
+    # via -r requirements/base.in
 trio==0.33.0
     # via
     #   selenium
@@ -437,8 +443,6 @@ typing-extensions==4.15.0
     #   limits
     #   pydantic
     #   pydantic-core
-    #   pyopenssl
-    #   referencing
     #   selenium
     #   shillelagh
     #   typing-inspection
